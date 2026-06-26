@@ -21,7 +21,7 @@
     .sp-bar-wrap{width:260px;height:5px;background:#111827;border-radius:5px;overflow:hidden;border:1px solid #1E2D42}
     .sp-bar{height:100%;width:5%;background:#F59E0B;border-radius:5px;transition:width 0.4s ease}
     .sp-msg{font-family:monospace;font-size:11px;color:#4B5563}
-    #safari-notice{display:none;margin:0 24px;background:#1a1a2e;border:1.5px solid #F59E0B;border-radius:12px;padding:20px;text-align:center;max-width:340px}
+    #safari-notice{display:none!important;margin:0 24px;background:#1a1a2e;border:1.5px solid #F59E0B;border-radius:12px;padding:20px;text-align:center;max-width:340px}
     #safari-notice h3{color:#F59E0B;font-size:16px;margin-bottom:10px}
     #safari-notice p{color:#94A3B8;font-size:13px;line-height:1.6;margin-bottom:12px}
     #safari-notice .steps{text-align:left;color:#CBD5E1;font-size:13px;line-height:2}
@@ -75,15 +75,7 @@ function sp(pct,msg){if(_bar)_bar.style.width=pct+'%';if(_msg&&msg)_msg.textCont
 window._sp=sp;
 sp(8,'Loading React…');
 
-// Detect non-Safari browsers (GoodReader uses WKWebView but without full JS engine context)
-// Show Safari notice after 8 seconds if still on splash
-var _safariFallback=setTimeout(function(){
-  var notice=document.getElementById('safari-notice');
-  if(notice){notice.style.display='block';}
-  sp(100,'Please open this file in Safari');
-},8000);
-
-window._clearFallback=function(){clearTimeout(_safariFallback);};
+window._clearFallback=function(){};
 </script>
 
 <!-- React 18 + ReactDOM (no Babel needed) -->
@@ -127,7 +119,7 @@ window._clearFallback=function(){clearTimeout(_safariFallback);};
   }catch(err){
     console.error('Compilation error:',err);
     document.getElementById('sp-msg').textContent='Error: '+err.message.slice(0,80);
-    document.getElementById('safari-notice').style.display='block';
+    console.error('App error - check console for details');
   }
 })();
 </script>
@@ -1662,15 +1654,6 @@ function AviLog() {
   );
 }
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(AviLog, null));
-</script>
-
-<script>
-// Register service worker for offline use (PWA)
-if('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('./sw.js').catch(function(){});
-  });
-}
 </script>
 </body>
 </html>
