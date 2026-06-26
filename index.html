@@ -16,25 +16,18 @@
     #splash{position:fixed;inset:0;background:#0A0F17;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:9999;transition:opacity 0.5s}
     #splash.hide{opacity:0;pointer-events:none}
     .sp-icon{width:60px;height:60px;border-radius:14px;background:#F59E0B;display:flex;align-items:center;justify-content:center;font-size:30px;color:#000}
-    .sp-title{font-weight:800;font-size:24px;color:#F1F5F9;letter-spacing:.05em}
-    .sp-sub{font-size:12px;color:#94A3B8;margin-top:2px}
     .sp-bar-wrap{width:260px;height:5px;background:#111827;border-radius:5px;overflow:hidden;border:1px solid #1E2D42}
-    .sp-bar{height:100%;width:5%;background:#F59E0B;border-radius:5px;transition:width 0.4s ease}
-    .sp-msg{font-family:monospace;font-size:11px;color:#4B5563}
-    #safari-notice{display:none!important;margin:0 24px;background:#1a1a2e;border:1.5px solid #F59E0B;border-radius:12px;padding:20px;text-align:center;max-width:340px}
-    #safari-notice h3{color:#F59E0B;font-size:16px;margin-bottom:10px}
-    #safari-notice p{color:#94A3B8;font-size:13px;line-height:1.6;margin-bottom:12px}
-    #safari-notice .steps{text-align:left;color:#CBD5E1;font-size:13px;line-height:2}
+    .sp-bar{height:100%;width:5%;background:#F59E0B;border-radius:5px;transition:width 0.6s ease}
+    .sp-msg{font-family:monospace;font-size:12px;color:#4B5563;text-align:center;max-width:280px;line-height:1.5}
     ::-webkit-scrollbar{width:4px;height:4px}
     ::-webkit-scrollbar-track{background:#0A0F17}
     ::-webkit-scrollbar-thumb{background:#1E2D42;border-radius:2px}
     @supports(padding:max(0px)){
-      body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+      body{padding-bottom:env(safe-area-inset-bottom)}
     }
     @media print{
       #splash,button{display:none!important}
-      body{background:white!important;color:black!important}
-      *{color:black!important;background:white!important;border-color:#ccc!important}
+      body,*{background:white!important;color:black!important;border-color:#ccc!important}
       table{font-size:8pt!important;border-collapse:collapse!important}
       th,td{border:1px solid #ddd!important;padding:3px 5px!important}
     }
@@ -44,88 +37,75 @@
 <div id="splash">
   <div class="sp-icon">✈</div>
   <div style="text-align:center">
-    <div class="sp-title">AVILOG</div>
-    <div class="sp-sub">SACAA-Compliant Logbook · G. Durr</div>
+    <div style="font-weight:800;font-size:24px;color:#F1F5F9;letter-spacing:.05em">AVILOG</div>
+    <div style="font-size:12px;color:#94A3B8;margin-top:3px">SACAA-Compliant Logbook · G. Durr</div>
   </div>
   <div class="sp-bar-wrap"><div class="sp-bar" id="sp-bar"></div></div>
-  <div class="sp-msg" id="sp-msg">Starting up…</div>
-  <div id="safari-notice">
-    <h3>⚠️ Open in Safari</h3>
-    <p>AVILOG requires Safari to run. It cannot run in GoodReader, Files app, or Mail.</p>
-    <div class="steps">
-      1. Tap the <strong style="color:#F59E0B">Share ⬆</strong> button below<br/>
-      2. Tap <strong style="color:#F59E0B">Open in Safari</strong><br/>
-      3. Bookmark or Add to Home Screen
-    </div>
-  </div>
+  <div class="sp-msg" id="sp-msg">Loading…<br/><span style="font-size:10px;color:#374151">First load takes ~20 seconds</span></div>
 </div>
 <div id="root"></div>
 
 <script>
-// Storage backed by localStorage
 window.storage={
   get:async(k)=>{try{const v=localStorage.getItem('av_'+k);return v!=null?{key:k,value:v}:null}catch{return null}},
   set:async(k,v)=>{try{localStorage.setItem('av_'+k,v);return{key:k,value:v}}catch{return null}},
   delete:async(k)=>{try{localStorage.removeItem('av_'+k);return{key:k,deleted:true}}catch{return null}}
 };
-
 var _bar=document.getElementById('sp-bar');
 var _msg=document.getElementById('sp-msg');
-function sp(pct,msg){if(_bar)_bar.style.width=pct+'%';if(_msg&&msg)_msg.textContent=msg;}
-window._sp=sp;
+function sp(pct,msg){
+  if(_bar)_bar.style.width=pct+'%';
+  if(_msg&&msg)_msg.innerHTML=msg+(pct<100?'<br/><span style="font-size:10px;color:#374151">First load takes ~20 seconds</span>':'');
+}
 sp(8,'Loading React…');
-
-window._clearFallback=function(){};
 </script>
 
-<!-- React 18 + ReactDOM (no Babel needed) -->
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" 
-  onload="window._sp(20,'React loaded…')"
-  crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
-  onload="window._sp(35,'Initialising…')"
-  crossorigin></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"
-  onload="window._sp(45,'Loading data…')"
-  crossorigin></script>
-
-<!-- Babel standalone for JSX compilation (cached by browser after first load) -->
-<script src="https://unpkg.com/@babel/standalone@7.23.2/babel.min.js"
-  onload="window._sp(60,'Compiling…')"
-  crossorigin></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin
+  onload="sp(20,'React ready…')"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin
+  onload="sp(35,'Loading data engine…')"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js" crossorigin
+  onload="sp(45,'Loading compiler…')"></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.2/babel.min.js" crossorigin
+  onload="sp(60,'Compiler ready…')"></script>
 
 <script>
-// Once all CDN scripts load, compile and run the app
-(function waitForBabel(){
-  if(typeof Babel==='undefined'||typeof React==='undefined'||typeof ReactDOM==='undefined'||typeof pako==='undefined'){
-    setTimeout(waitForBabel,100);return;
+(function boot(){
+  if(typeof Babel==='undefined'||typeof React==='undefined'||typeof pako==='undefined'){
+    setTimeout(boot,200);
+    return;
   }
-  window._sp(70,'Compiling app…');
-  try{
-    // Get the JSX source and compile it
-    var source=document.getElementById('app-jsx').textContent;
-    window._sp(80,'Parsing…');
-    var compiled=Babel.transform(source,{presets:['react'],filename:'avilog.jsx'}).code;
-    window._sp(90,'Running…');
-    // Execute compiled code
-    var fn=new Function('React','ReactDOM','pako',compiled);
-    fn(React,ReactDOM,pako);
-    window._clearFallback&&window._clearFallback();
-    window._sp(100,'Ready');
-    setTimeout(function(){
-      var splash=document.getElementById('splash');
-      if(splash){splash.classList.add('hide');setTimeout(function(){if(splash.parentNode)splash.parentNode.removeChild(splash);},600);}
-    },300);
-  }catch(err){
-    console.error('Compilation error:',err);
-    document.getElementById('sp-msg').textContent='Error: '+err.message.slice(0,80);
-    console.error('App error - check console for details');
-  }
+  sp(65,'Compiling app — please wait…');
+  // Use setTimeout(0) to let the browser render the progress update first
+  setTimeout(function(){
+    try{
+      var src=document.getElementById('app-src').textContent;
+      sp(75,'Compiling…');
+      var compiled=Babel.transform(src,{presets:['react'],filename:'avilog.jsx'}).code;
+      sp(90,'Starting…');
+      setTimeout(function(){
+        try{
+          var fn=new Function('React','ReactDOM','pako',compiled);
+          fn(React,ReactDOM,pako);
+          sp(100,'Ready!');
+          setTimeout(function(){
+            var s=document.getElementById('splash');
+            if(s){s.classList.add('hide');setTimeout(function(){s.remove();},600);}
+          },200);
+        }catch(e){
+          document.getElementById('sp-msg').textContent='Error: '+e.message;
+          console.error(e);
+        }
+      },50);
+    }catch(e){
+      document.getElementById('sp-msg').textContent='Compile error: '+e.message;
+      console.error(e);
+    }
+  },100);
 })();
 </script>
 
-<!-- JSX source (not executed directly, compiled by Babel above) -->
-<script type="text/plain" id="app-jsx">
+<script type="text/plain" id="app-src">
 const { useState, useEffect, useRef, useMemo } = React;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1653,6 +1633,7 @@ function AviLog() {
     </div>
   );
 }
+
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(AviLog, null));
 </script>
 </body>
